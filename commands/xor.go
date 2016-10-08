@@ -4,7 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/cderwin/cryptopals/basic"
+	"github.com/cderwin/cryptopals/ciphers/xor"
+	"github.com/cderwin/cryptopals/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,13 @@ var XorCommand = &cobra.Command{
 		if key == "" {
 			return InvalidKeyError
 		}
-		return basic.XorHook(os.Stdin, []byte(key), os.Stdout)
+
+		reader, err := utils.NewFileReader(args)
+		if err != nil {
+			return err
+		}
+
+		return xor.XorMain(reader, []byte(key), os.Stdout)
 	},
 }
 

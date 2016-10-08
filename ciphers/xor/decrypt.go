@@ -1,4 +1,4 @@
-package basic
+package xor
 
 import (
 	"bufio"
@@ -6,35 +6,9 @@ import (
 	"fmt"
 	"io"
 	"sort"
+
+	"github.com/cderwin/cryptopals/utils"
 )
-
-// Xor Encrypt Hook
-
-func XorHook(r io.Reader, key []byte, w io.Writer) error {
-	scanner := bufio.NewScanner(r)
-	keyLen := len(key)
-	for scanner.Scan() {
-		bytes := scanner.Bytes()
-		ciphertext := make([]byte, len(bytes))
-		for i, b := range bytes {
-			ciphertext[i] = b ^ key[i%keyLen]
-		}
-		w.Write(append(ciphertext, byte('\n')))
-	}
-
-	return nil
-}
-
-func xor(plaintext, key []byte) []byte {
-	keyLength := len(key)
-	ciphertext := make([]byte, len(plaintext))
-	for i := range plaintext {
-		ciphertext[i] = plaintext[i] ^ key[i%keyLength]
-	}
-	return ciphertext
-}
-
-// Xor Decryption
 
 // A "candidate" for decryption is a (key, plaintext, score) tuple.  Lower scores are better.
 
@@ -46,7 +20,7 @@ type DecryptionCandidate struct {
 
 func NewCandidate(ciphertext, key []byte) DecryptionCandidate {
 	plaintext := xor(ciphertext, key)
-	score := NewFrequency(plaintext).Score()
+	score := utils.NewFrequency(plaintext).Score()
 	return DecryptionCandidate{plaintext: plaintext, key: key, score: score}
 }
 
@@ -75,7 +49,7 @@ var (
 
 // Hook to break xor
 
-func BreakXorHook(r io.Reader, w io.Writer, keyLen int, numResults int) error {
+func XorDecryptMain(r io.Reader, w io.Writer, keyLen int, numResults int) error {
 	if keyLen != 1 {
 		return InvalidKeyLen
 	}
