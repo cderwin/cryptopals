@@ -16,8 +16,8 @@ By Cameron Derwin, source at github.com/cderwin/cryptopals`,
 }
 
 func AddCommands() {
-	RootCommand.AddCommand(XorCommand)
 	RootCommand.AddCommand(EncodingCommand)
+	RootCommand.AddCommand(EncryptCommand)
 }
 
 func Execute() {

@@ -1,32 +1,43 @@
 package xor
 
 import (
-	"bufio"
-	"io"
+	"github.com/cderwin/cryptopals/ciphers"
 )
 
-// Xor Encrypt Hook
+type XorAlgorithm struct {
+	key    []byte
+	keySet bool
+}
 
-func XorMain(r io.Reader, key []byte, w io.Writer) error {
-	scanner := bufio.NewScanner(r)
-	keyLen := len(key)
-	for scanner.Scan() {
-		bytes := scanner.Bytes()
-		ciphertext := make([]byte, len(bytes))
-		for i, b := range bytes {
-			ciphertext[i] = b ^ key[i%keyLen]
-		}
-		w.Write(append(ciphertext, byte('\n')))
-	}
+func NewXorAlgorithm() *XorAlgorithm {
+	return &XorAlgorithm{}
+}
 
+func (algo *XorAlgorithm) ParseKey(key []byte) error {
+	algo.key = key
 	return nil
 }
 
-func xor(plaintext, key []byte) []byte {
-	keyLength := len(key)
-	ciphertext := make([]byte, len(plaintext))
-	for i := range plaintext {
-		ciphertext[i] = plaintext[i] ^ key[i%keyLength]
+func (algo *XorAlgorithm) Encrypt(plaintext []byte) ([]byte, error) {
+	if !algo.keySet {
+		return nil, ciphers.NoKeySetError
 	}
-	return ciphertext
+	return xor(plaintext, algo.key), nil
+}
+
+func (algo *XorAlgorithm) Decrypt(ciphertext []byte) ([]byte, error) {
+	if !algo.keySet {
+		return nil, ciphers.NoKeySetError
+	}
+	return xor(ciphertext, algo.key), nil
+}
+
+func xor(text, key []byte) []byte {
+	keyLength := len(key)
+	result := make([]byte, len(text))
+	for i := range text {
+		result[i] = text[i] ^ key[i%keyLength]
+	}
+
+	return result
 }
