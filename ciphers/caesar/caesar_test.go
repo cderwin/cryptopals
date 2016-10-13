@@ -115,6 +115,30 @@ func TestEncryptWithoutKey(t *testing.T) {
 }
 
 func TestDecrypt(t *testing.T) {
+	cases := map[textKeyTuple]string{
+		textKeyTuple{"My first ciphertext", "a"}: "My first ciphertext",
+		textKeyTuple{"Eq xajkl uahzwjlwpl", "s"}: "My first ciphertext",
+		textKeyTuple{"My first ciphertext", "a"}: "My first ciphertext",
+		textKeyTuple{"Eq xajkl uahzwjlwpl", "S"}: "My first ciphertext",
+	}
+
+	for tuple, expected := range cases {
+		algo := NewCaesarAlgorithm()
+		if err := algo.ParseKey([]byte(tuple.key)); err != nil {
+			t.Errorf("Error raised during `.ParseKey()`: %s", err)
+			return
+		}
+
+		result, err := algo.Decrypt([]byte(tuple.text))
+		if err != nil {
+			t.Errorf("Error raised during `.Decrypt()`: %s", err)
+			return
+		}
+
+		if string(result) != expected {
+			t.Errorf("Decryption result (%q) not equal to expected (%q)", result, expected)
+		}
+	}
 }
 
 func TestDecryptWithoutKey(t *testing.T) {
