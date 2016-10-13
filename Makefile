@@ -4,13 +4,16 @@ ENTRYPOINT := github.com/cderwin/cryptopals
 
 OS := linux
 
-.PHONY: all build clean
+.PHONY: all build clean test
 
 all: build
 
 build:
 	mkdir -p $(BUILDDIR) && \
 	go build -o $(BUILDDIR)/cryptopals $(ENTRYPOINT)
+
+test:
+	go test ./...
 
 clean:
 	@rm -rf $(BUILDDIR)
