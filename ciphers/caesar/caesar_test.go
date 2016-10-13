@@ -2,6 +2,8 @@ package caesar
 
 import (
 	"testing"
+
+	"github.com/cderwin/cryptopals/ciphers"
 )
 
 type charShiftCase struct {
@@ -69,5 +71,56 @@ func TestParseKeyErrors(t *testing.T) {
 		if result != expected {
 			t.Errorf("Result error (%s) not equal to expected error (%s)", result, expected)
 		}
+	}
+}
+
+type textKeyTuple struct {
+	text string
+	key  string
+}
+
+func TestEncrypt(t *testing.T) {
+	cases := map[textKeyTuple]string{
+		textKeyTuple{"My first plaintext", "a"}: "My first plaintext",
+		textKeyTuple{"My first plaintext", "s"}: "Eq xajkl hdsaflwpl",
+		textKeyTuple{"My first plaintext", "A"}: "My first plaintext",
+		textKeyTuple{"My first plaintext", "S"}: "Eq xajkl hdsaflwpl",
+	}
+
+	for tuple, expected := range cases {
+		algo := NewCaesarAlgorithm()
+		if err := algo.ParseKey([]byte(tuple.key)); err != nil {
+			t.Errorf("Error raised during `.ParseKey()`: %s", err)
+			return
+		}
+
+		result, err := algo.Encrypt([]byte(tuple.text))
+		if err != nil {
+			t.Errorf("Error raised during `.Encrypt()`: %s", err)
+			return
+		}
+
+		if string(result) != expected {
+			t.Errorf("Encryption result (%q) not equal to expected (%q)", result, expected)
+		}
+	}
+}
+
+func TestEncryptWithoutKey(t *testing.T) {
+	algo := &CaesarAlgorithm{}
+	_, err := algo.Encrypt([]byte("Some random plaintext"))
+	if err != ciphers.NoKeySetError {
+		t.Errorf("No error given when encryption attempted without key")
+	}
+}
+
+func TestDecrypt(t *testing.T) {
+}
+
+func TestDecryptWithoutKey(t *testing.T) {
+	algo := &CaesarAlgorithm{}
+	_, err := algo.Decrypt([]byte("Some random ciphertext"))
+	if err != ciphers.NoKeySetError {
+		t.Errorf("No error given when decryption attempted without key")
 	}
 }
