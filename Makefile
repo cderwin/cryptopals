@@ -13,7 +13,7 @@ build:
 	go build -o $(BUILDDIR)/cryptopals $(ENTRYPOINT)
 
 test:
-	go test ./...
+	go test -v ./...
 
 clean:
 	@rm -rf $(BUILDDIR)
